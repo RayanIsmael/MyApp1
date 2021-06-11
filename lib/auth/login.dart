@@ -169,7 +169,7 @@ class _LoginState extends State<Login> {
       formatdata.save();
       ///////////////////////////
       try {
-        showDialog();
+        //showDialog();
         // ignore: unused_local_variable
         UserCredential userCredential = await auth.signInWithEmailAndPassword(
             email: email, password: password);
@@ -188,7 +188,7 @@ class _LoginState extends State<Login> {
               .showSnackBar(snackbar);
           ///////////////////////////
         } else if (e.code == 'wrong-password') {
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
           ////////////////////////////
           var snackbar = SnackBar(
             content: Text("Wrong password provided for that user."),
@@ -200,7 +200,7 @@ class _LoginState extends State<Login> {
               .showSnackBar(snackbar);
           ///////////////////////////
         } else if (e.code == 'invalid-email') {
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
           ////////////////////////////
           var snackbar = SnackBar(
             content: Text("invalid-email"),
@@ -220,18 +220,18 @@ class _LoginState extends State<Login> {
   }
 
   ////Alert Dialog////
-  showDialog() {
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.NO_HEADER, //more
-      animType: AnimType.SCALE, //more
-      body: Container(
-          height: 100,
-          child: Center(
-            child: CircularProgressIndicator(),
-          )),
-      ////more....
-    )..show();
-  }
+  // showDialog() {
+  //   AwesomeDialog(
+  //     context: context,
+  //     dialogType: DialogType.NO_HEADER, //more
+  //     animType: AnimType.SCALE, //more
+  //     body: Container(
+  //         height: 100,
+  //         child: Center(
+  //           child: CircularProgressIndicator(),
+  //         )),
+  //     ////more....
+  //   )..show();
+  // }
   ///////////////////
 }
