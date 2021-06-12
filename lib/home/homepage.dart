@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp1/auth/login.dart';
-import 'package:myapp1/auth/signup.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -45,7 +44,7 @@ class _HomePageState extends State<HomePage> {
           ),
         );
 
-        scaffoldkey.currentState.showSnackBar(snackbar);
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
         ///////////////////////////
       }
     });
@@ -59,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: scaffoldkey,
       appBar: AppBar(
-        title: Text('Hello ${auth.currentUser.email}'),
+        title: Text('Home Page'),
         titleSpacing: 2,
         centerTitle: true,
         actions: [

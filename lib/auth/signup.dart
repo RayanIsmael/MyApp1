@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp1/auth/login.dart';
@@ -197,12 +199,20 @@ class _SignUPState extends State<SignUP> {
       formdata.save();
       /////////////////////////////
       try {
+        showDialog();
         // ignore: unused_local_variable
         UserCredential userCredential = await auth
             .createUserWithEmailAndPassword(email: email, password: password);
+        ////////// Save name and email in firestore
+        await FirebaseFirestore.instance.collection('users').add({
+          "username": username,
+          "email":email
+        });
+        //////////////////////////////
         Navigator.of(context).pushReplacementNamed("HomePage");
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
+          Navigator.of(context).pop(); //to close AlertDialog
           ////////////////////////////
           var snackbar = SnackBar(
             content: Text("The password provided is too weak."),
@@ -212,6 +222,7 @@ class _SignUPState extends State<SignUP> {
           scaffoldkey.currentState.showSnackBar(snackbar);
           ///////////////////////////
         } else if (e.code == 'email-already-in-use') {
+          Navigator.of(context).pop(); //to close AlertDialog
           ////////////////////////////
           var snackbar = SnackBar(
             content: Text("The account already exists for that email."),
@@ -222,6 +233,7 @@ class _SignUPState extends State<SignUP> {
           ///////////////////////////
 
         } else if (e.code == 'invalid-email') {
+          Navigator.of(context).pop(); //to close AlertDialog
           ////////////////////////////
           var snackbar = SnackBar(
             content: Text("invalid-email."),
@@ -232,19 +244,36 @@ class _SignUPState extends State<SignUP> {
           ///////////////////////////
         }
       } catch (e) {
+        Navigator.of(context).pop(); //to close AlertDialog
         print(e);
       }
       ////////////////////////////
 
     } else {
       ////////////////////////////
-          var snackbar = SnackBar(
-            content: Text("invalid-Input"),
-            duration: Duration(seconds: 1),
-          );
-          // ignore: deprecated_member_use
-          scaffoldkey.currentState.showSnackBar(snackbar);
-          ///////////////////////////
+      var snackbar = SnackBar(
+        content: Text("invalid-Input"),
+        duration: Duration(seconds: 1),
+      );
+      // ignore: deprecated_member_use
+      scaffoldkey.currentState.showSnackBar(snackbar);
+      ///////////////////////////
     }
   }
+
+  ////Alert Dialog////
+  showDialog() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.NO_HEADER, //more
+      animType: AnimType.SCALE, //more
+      body: Container(
+          height: 100,
+          child: Center(
+            child: CircularProgressIndicator(),
+          )),
+      ////more....
+    )..show();
+  }
+  ///////////////////
 }

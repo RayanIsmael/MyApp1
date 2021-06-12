@@ -215,6 +215,7 @@ class _LoginState extends State<Login> {
       }
       ///////////////////////////
     } else {
+      Navigator.of(context).pop();//to close AlertDialog
       print("Un Valid");
     }
   }

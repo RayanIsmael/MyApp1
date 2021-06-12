@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Add extends StatefulWidget {
   Add({Key key}) : super(key: key);
@@ -8,6 +14,8 @@ class Add extends StatefulWidget {
 }
 
 class _AddState extends State<Add> {
+  var imagepicker = ImagePicker();
+  var image_url;
   @override
   Widget build(BuildContext context) {
     double mediaqury = MediaQuery.of(context).size.height;
@@ -58,7 +66,7 @@ class _AddState extends State<Add> {
                 ////////////////////////
                 InkWell(
                     onTap: () {
-                      Show();
+                      Show(context);
                     },
                     child: Container(
                       // this containar maked by Adobe XD
@@ -115,31 +123,58 @@ class _AddState extends State<Add> {
   }
 
   // ignore: non_constant_identifier_names
-  Show() {
+  Show(context) {
     return showModalBottomSheet(
         context: context,
         backgroundColor: Theme.of(context).primaryColor,
         shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.elliptical(150, 30))),
-        
+            borderRadius:
+                BorderRadius.vertical(top: Radius.elliptical(150, 30))),
         builder: (context) {
           return Container(
             height: 200,
             child: Column(
-              mainAxisAlignment:MainAxisAlignment.start ,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SizedBox(height: 30,),
+                SizedBox(
+                  height: 30,
+                ),
                 ListTile(
                   leading: Icon(Icons.photo_camera_back),
                   title: Text('Studio'),
-                  onTap: () {
-                    
+                  onTap: () async {
+                    var imgpick =
+                        await imagepicker.getImage(source: ImageSource.gallery);
+                    if (imgpick != null) {
+                      File file = File(imgpick.path);
+                      int random = Random().nextInt(100000);
+                      String imagename =
+                          "$random" + "${basename(imgpick.path)}";
+                      Reference ref = FirebaseStorage.instance
+                          .ref("image")
+                          .child(imagename);
+                      await ref.putFile(file);
+                      image_url =await  ref.getDownloadURL();
+                    }
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.camera_alt),
                   title: Text('Camera'),
-                  onTap: () {
+                  onTap: () async {
+                    var imgpick =
+                        await imagepicker.getImage(source: ImageSource.camera);
+                    if (imgpick != null) {
+                      File file = File(imgpick.path);
+                      int random = Random().nextInt(100000);
+                      String imagename =
+                          "$random" + "${basename(imgpick.path)}";
+                      Reference ref = FirebaseStorage.instance
+                          .ref("image")
+                          .child(imagename);
+                      await ref.putFile(file);
+                      image_url =await  ref.getDownloadURL();
+                    }
                   },
                 ),
               ],
