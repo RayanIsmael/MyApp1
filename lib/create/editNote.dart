@@ -8,14 +8,18 @@ import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class Add extends StatefulWidget {
-  Add({Key key}) : super(key: key);
+class Edit extends StatefulWidget {
+  final docid;
+  final oldtitle;
+  final oldnote;
+  final oldimage;
+  Edit({Key key, this.docid, this.oldtitle, this.oldnote,this.oldimage}) : super(key: key);
 
   @override
-  _AddState createState() => _AddState();
+  _EditState createState() => _EditState();
 }
 
-class _AddState extends State<Add> {
+class _EditState extends State<Edit> {
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   CollectionReference refnote = FirebaseFirestore.instance.collection("note");
   Reference ref;
@@ -24,12 +28,13 @@ class _AddState extends State<Add> {
   var imagepicker = ImagePicker();
   var title, note, image_url;
   bool checkimage = false;
+  Map<String, dynamic> alldata;
   @override
   Widget build(BuildContext context) {
     double mediaqury = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
-          title: Text('Add Note'),
+          title: Text('Edit Note'),
           titleSpacing: 2,
           centerTitle: true,
         ),
@@ -45,6 +50,7 @@ class _AddState extends State<Add> {
                     child: Column(
                       children: [
                         TextFormField(
+                          initialValue: widget.oldtitle,
                           //////
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onSaved: (newValue) {
@@ -76,6 +82,7 @@ class _AddState extends State<Add> {
                           height: 20,
                         ),
                         TextFormField(
+                          initialValue: widget.oldnote,
                           //////
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onSaved: (newValue) {
@@ -104,6 +111,18 @@ class _AddState extends State<Add> {
                               hintText: "Note"),
                         ),
                         ///////////
+                        SizedBox(height: 30,),
+                        //////Image////
+                        Text("Old Image",style: TextStyle(fontSize: 18,color: Colors.black87),),
+                        Container(
+
+                          child: Image.network(
+                                widget.oldimage,
+                                height: 120,
+                                width: 150,
+                                fit: BoxFit.fill,
+                              ),
+                        ),
                       ],
                     )),
                 ////////////////////////
@@ -129,7 +148,7 @@ class _AddState extends State<Add> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Add Image For Note',
+                            'Edit Image For Note',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -148,7 +167,7 @@ class _AddState extends State<Add> {
                 /////////////////////////////
                 InkWell(
                     onTap: () async {
-                      await addnote(context);
+                      await editnote(context);
                     },
                     child: Container(
                       // this containar maked by Adobe XD
@@ -166,7 +185,7 @@ class _AddState extends State<Add> {
                         ),
                       ),
                       child: Text(
-                        'Add Note',
+                        'Edit Note',
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.white,
@@ -244,38 +263,33 @@ class _AddState extends State<Add> {
         });
   }
 
-  //////Add Note////
-  addnote(context) async {
-    if (file == null) {
-      return AwesomeDialog(
-        context: context,
-        dialogType: DialogType.ERROR, //more
-        animType: AnimType.BOTTOMSLIDE, //more
-        body: Container(
-          padding: const EdgeInsets.all(20.0),
-            child: Text(
-          "Please Choose Image",
-          style: TextStyle(fontSize: 18, color: Colors.red),
-        )),
-        ////more....
-      )..show();
-    }
+  //////Edit Note////
+  editnote(context) async {
     var formdata = formkey.currentState;
-    if (formdata.validate()) {
-      showDialog(context);
-      formdata.save();
-      await ref.putFile(file);
-      image_url = await ref.getDownloadURL();
-      refnote.add({
-        "title": title,
-        "note": note,
-        "image_url": image_url,
-        "user_id": FirebaseAuth.instance.currentUser.uid,
-      });
-      Navigator.of(context).pushNamed("HomePage");
+    if (file == null) {
+      if (formdata.validate()) {
+        showDialog(context);
+        formdata.save();
+        refnote.doc(widget.docid).update({
+          "title": title,
+          "note": note,
+        });
+        Navigator.of(context).pushNamed("HomePage");
+      }
+    } else {
+      if (formdata.validate()) {
+        showDialog(context);
+        formdata.save();
+        await ref.putFile(file);
+        image_url = await ref.getDownloadURL();
+        refnote.doc(widget.docid).update({
+          "title": title,
+          "note": note,
+          "image_url": image_url,
+        });
+        Navigator.of(context).pushNamed("HomePage");
+      }
     }
-
-    ///if(formdata.validate())
   }
 
   //////Add Note////
@@ -293,5 +307,4 @@ class _AddState extends State<Add> {
       ////more....
     )..show();
   }
-  ///////////////////
 }
